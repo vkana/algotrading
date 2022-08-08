@@ -16,15 +16,15 @@ class Position(object):
 
 class My(object):
     def __init__(self):
-        self.key_id = constants.ALPACA_API_KEY
-        self.secret_key = constants.ALPACA_SECRET_KEY
+        self.key_id = constants.ALPACA_API_KEY2
+        self.secret_key = constants.ALPACA_SECRET_KEY2
         self.base_url = constants.base_url
         self.stocks = ['TQQQ', 'SQQQ']
         self.positions = {}
         self.target_price = 0.05
         self.start_equity = 0
         self.last_equity = 0
-        self.live = True
+        self.live = False
 
         if self.live:
             self.base_url = constants.base_url_live
@@ -55,7 +55,7 @@ class My(object):
                 return
             
             try:
-                self.api.submit_order(symbol, position.qty, 'buy', 'market', 'day')
+                self.api.submit_order(symbol, position.qty, 'buy', 'trailing_stop', 'day', trail_percent=0.1)
                 position.last_price = price
                 position.qty *= 2
             except Exception as e:
@@ -65,7 +65,8 @@ class My(object):
         if position.qty_available > 0 and price > position.entry_price + self.target_price:
             try:
                 #self.api.submit_order(symbol, position.qty_available, 'sell', 'market', 'day')
-                self.api.close_position(symbol)
+                self.api.submit_order(symbol, position.qty_available, 'sell', 'trailing_stop', 'day', trail_percent=0.1)
+                #self.api.close_position(symbol)
                 #reset
                 position.last_price = 0
                 position.qty_available = 0

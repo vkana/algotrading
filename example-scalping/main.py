@@ -114,13 +114,21 @@ class ScalpAlgo:
             return False
 
     def on_bar(self, bar):
-        self._bars = self._bars.append(pd.DataFrame({
+        # self._bars = self._bars.append(pd.DataFrame({
+        #     'open': bar.open,
+        #     'high': bar.high,
+        #     'low': bar.low,
+        #     'close': bar.close,
+        #     'volume': bar.volume,
+        # }, index=[pd.Timestamp(bar.timestamp, tz=pytz.UTC)]))
+
+        self._bars = pd.concat([self._bars, pd.DataFrame({
             'open': bar.open,
             'high': bar.high,
             'low': bar.low,
             'close': bar.close,
             'volume': bar.volume,
-        }, index=[pd.Timestamp(bar.timestamp, tz=pytz.UTC)]))
+        }, index=[pd.Timestamp(bar.timestamp, tz=pytz.UTC)])])
 
         self._l.info(
             f'received bar start: {pd.Timestamp(bar.timestamp)}, close: {bar.close}, len(bars): {len(self._bars)}')
@@ -201,7 +209,7 @@ class ScalpAlgo:
                 self._api.get_latest_trade(
                     self._symbol).price)
             cost_basis = float(self._position.avg_entry_price)
-            limit_price = max(cost_basis + 0.01, current_price)
+            limit_price = round(max(cost_basis + 0.01, current_price),2)
             params.update(dict(
                 type='limit',
                 limit_price=limit_price,
@@ -254,9 +262,9 @@ def main(args):
 
     async def periodic():
         while True:
-            if not api.get_clock().is_open:
-                logger.info('exit as market is not open')
-                sys.exit(0)
+            # if not api.get_clock().is_open:
+            #     logger.info('exit as market is not open')
+            #     sys.exit(0)
             await asyncio.sleep(30)
             positions = api.list_positions()
             for symbol, algo in fleet.items():

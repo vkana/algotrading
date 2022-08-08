@@ -1,3 +1,6 @@
+from sqlite3 import Timestamp
+import pandas as pd
+
 class Position(object):
     def __init__(self):
         self.qty = 1
@@ -5,6 +8,12 @@ class Position(object):
 class Sample(object):
     def __init__(self):
         self.name='Sample'
+
+    def func(self):
+        if 1==1:
+            print('here')
+            return
+        print('here2')
     
     def start(self):
         print('start')
@@ -21,6 +30,10 @@ class Sample(object):
         a = 2
         b = 3
         print (f'{a} / {b}')
+        print (pd.Timestamp.now(tz='America/New_York').floor('1min'))
+
+        
+
 
         
 
@@ -29,3 +42,4 @@ class Sample(object):
 if __name__ == '__main__':
     trader = Sample()
     trader.start()
+    trader.func()
