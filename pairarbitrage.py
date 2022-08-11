@@ -57,6 +57,7 @@ class My(object):
                 print('opening..')
                 self.api.submit_order('TQQQ', side='buy',  notional=30000)
                 self.api.submit_order('SQQQ', side='buy', notional=30000)
+                self.api.submit_order('SQQQ', qty=10, side='buy', trail_price=0.03 )
                 time.sleep(1)
 
             else:
@@ -79,9 +80,11 @@ class My(object):
         
 
         async def handle_trades(trade):
+            print('trade')
             self.process_trade(trade.symbol, trade.price)
         
         async def handle_trade_updates(data):
+            print('trade_update')
             pass
             # if data.event == 'fill' or data.event == 'partial_fill':
             #     print(f'fill')
