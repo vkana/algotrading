@@ -58,6 +58,8 @@ class My(object):
             #print(f'Buy condition: {symbol} {position.qty} {ask_price} <= {position.last_price - self.target_price}')
             if float(self.api.get_account().regt_buying_power) < ask_price * position.qty:
                 print(f'{self.now} {symbol} {ask_price} {position.entry_price} {position.qty} No buying power. Skipping..')
+                #avoid get_account call repeatedly
+                position.last_price = ask_price
                 return
             
             try:
@@ -107,9 +109,7 @@ class My(object):
             if (float(quote.ask_price) == 0 or float(quote.bid_price) == 0):
                 return
             #print(f'{datetime.datetime.now()} {quote.symbol} {quote.bid_price} {quote.ask_price}')
-
             self.process_trade(quote.symbol, float(quote.bid_price), float(quote.ask_price))
-            time.sleep(0.25)
 
         async def handle_trade_updates(data):
             if data.event == 'fill' or data.event == 'partial_fill':

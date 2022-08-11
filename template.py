@@ -7,7 +7,7 @@ from alpaca.trading.enums import AssetClass
 
 key = "PKB97SPJRL9JL90D7ZQR"
 secret = "YvmDUETetE3xSH2DojMlFpEbHYzepWVThWfe5oFz"
-symbols = ('F', 'SPY', 'TQQQ','SQQQ',)
+symbols = ('TQQQ','SQQQ',)
 trading_client = TradingClient(key, secret, paper = True)
 client = StockHistoricalDataClient(key, secret)
 data = client.get_stock_latest_trade(StockLatestTradeRequest(symbol_or_symbols = symbols ))
