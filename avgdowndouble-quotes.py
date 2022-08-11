@@ -99,7 +99,7 @@ class My(object):
         async def handle_quotes(quote):
             if (float(quote.ask_price) == 0 or float(quote.bid_price) == 0):
                 return
-            print(f'{datetime.datetime.now()} {quote.symbol} {quote.bid_price} {quote.ask_price}')
+            #print(f'{datetime.datetime.now()} {quote.symbol} {quote.bid_price} {quote.ask_price}')
 
             self.process_trade(quote.symbol, float(quote.bid_price), float(quote.ask_price))
             time.sleep(0.1)
