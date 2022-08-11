@@ -18,15 +18,15 @@ class Position(object):
 
 class My(object):
     def __init__(self):
-        self.key_id = constants.ALPACA_API_KEY2
-        self.secret_key = constants.ALPACA_SECRET_KEY2
+        self.key_id = constants.ALPACA_API_KEY
+        self.secret_key = constants.ALPACA_SECRET_KEY
         self.base_url = constants.base_url
         self.stocks = ('TQQQ', 'SQQQ')
         self.positions = {}
         self.target_price = 0.05
         self.start_equity = 0
         self.last_equity = 0
-        self.live = False
+        self.live = True
 
         if self.live:
             self.base_url = constants.base_url_live
@@ -53,6 +53,7 @@ class My(object):
         last_price = position.last_price
         
         if last_price == 0 or ask_price <= last_price - self.target_price:
+            print(f'Buy condition: {symbol} {position.qty} {ask_price} <= {position.last_price} - {self.target_price}')
             if float(self.api.get_account().regt_buying_power) < ask_price * position.qty:
                 print(f'{symbol} {ask_price} {position.entry_price} {position.qty} No buying power. Skipping..')
                 return
@@ -92,6 +93,7 @@ class My(object):
                 position.last_price = position.entry_price
                 position.qty_available = int(acct_position.qty_available)
                 position.qty = position.qty_available
+                print(f'Existing position: {symbol} {position.qty} {position.last_price}')
             except:
                 position.entry_price = 0
                 position.qty_available = 0
@@ -102,7 +104,7 @@ class My(object):
             #print(f'{datetime.datetime.now()} {quote.symbol} {quote.bid_price} {quote.ask_price}')
 
             self.process_trade(quote.symbol, float(quote.bid_price), float(quote.ask_price))
-            time.sleep(0.1)
+            time.sleep(0.25)
         
         async def handle_trade_updates(data):
             if data.event == 'fill' or data.event == 'partial_fill':
