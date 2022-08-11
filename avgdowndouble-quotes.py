@@ -53,7 +53,6 @@ class My(object):
         last_price = position.last_price
         
         if last_price == 0 or ask_price <= last_price - self.target_price:
-            print(f'Buy condition: {symbol} {position.qty} {ask_price} <= {position.last_price} - {self.target_price}')
             if float(self.api.get_account().regt_buying_power) < ask_price * position.qty:
                 print(f'{symbol} {ask_price} {position.entry_price} {position.qty} No buying power. Skipping..')
                 return
