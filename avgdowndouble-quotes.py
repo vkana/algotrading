@@ -19,8 +19,8 @@ class Position(object):
 
 class My(object):
     def __init__(self):
-        self.key_id = constants.ALPACA_API_KEY2
-        self.secret_key = constants.ALPACA_SECRET_KEY2
+        self.key_id = constants.ALPACA_API_KEY3
+        self.secret_key = constants.ALPACA_SECRET_KEY3
         self.base_url = constants.base_url
         self.stocks = ('TQQQ', 'SQQQ')
         self.positions = {}
@@ -103,7 +103,7 @@ class My(object):
 
         async def handle_quotes(quote):
             self.now = datetime.now().time().strftime('%H:%M:%S')
-            print(self.now,quote.timestamp)
+            #print(self.now, quote.timestamp.strftime('%H:%M:%S'))
             if (float(quote.ask_price) == 0 or float(quote.bid_price) == 0):
                 return
             #print(f'{datetime.datetime.now()} {quote.symbol} {quote.bid_price} {quote.ask_price}')
