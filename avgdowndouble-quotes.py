@@ -1,12 +1,13 @@
 import alpaca_trade_api as tradeapi
 import constants
 from alpaca_trade_api.stream import Stream
-import datetime
+from datetime import datetime 
 import time
 
 
 
 initial_qty = 5
+now = ''
 
 class Position(object):
     def __init__(self):
@@ -18,8 +19,8 @@ class Position(object):
 
 class My(object):
     def __init__(self):
-        self.key_id = constants.ALPACA_API_KEY3
-        self.secret_key = constants.ALPACA_SECRET_KEY3
+        self.key_id = constants.ALPACA_API_KEY2
+        self.secret_key = constants.ALPACA_SECRET_KEY2
         self.base_url = constants.base_url
         self.stocks = ('TQQQ', 'SQQQ')
         self.positions = {}
@@ -27,6 +28,7 @@ class My(object):
         self.start_equity = 0
         self.last_equity = 0
         self.live = False
+        self.now = ''
 
         if self.live:
             self.base_url = constants.base_url_live
@@ -55,7 +57,7 @@ class My(object):
         if last_price == 0 or ask_price <= last_price - self.target_price:
             #print(f'Buy condition: {symbol} {position.qty} {ask_price} <= {position.last_price - self.target_price}')
             if float(self.api.get_account().regt_buying_power) < ask_price * position.qty:
-                print(f'{symbol} {ask_price} {position.entry_price} {position.qty} No buying power. Skipping..')
+                print(f'{self.now} {symbol} {ask_price} {position.entry_price} {position.qty} No buying power. Skipping..')
                 return
             
             try:
@@ -64,6 +66,7 @@ class My(object):
                 position.qty *= 2
             except Exception as e:
                 print(symbol, ask_price, position.entry_price, position.qty,  e)
+                print('after exception -', symbol, position.last_price)
             return
         
         if position.qty_available > 0 and bid_price >= position.entry_price + self.target_price:
@@ -99,6 +102,8 @@ class My(object):
                 position.qty_available = 0
 
         async def handle_quotes(quote):
+            self.now = datetime.now().time().strftime('%H:%M:%S')
+            print(self.now,quote.timestamp)
             if (float(quote.ask_price) == 0 or float(quote.bid_price) == 0):
                 return
             #print(f'{datetime.datetime.now()} {quote.symbol} {quote.bid_price} {quote.ask_price}')
@@ -125,7 +130,7 @@ class My(object):
                     position.qty = initial_qty
                     position.last_price = 0
                 
-                print(f'{side} {symbol} {price} / {position.entry_price} qty: {data.qty} / {position.qty_available} eq: {current_equity} PnL: ${round(current_equity - self.start_equity, 2)} / ${round(current_equity - self.last_equity, 2)}')
+                print(f'{self.now} {side} {symbol} {price} / {position.entry_price} qty: {data.qty} / {position.qty_available} eq: {current_equity} PnL: ${round(current_equity - self.start_equity, 2)} / ${round(current_equity - self.last_equity, 2)}')
 
         async def handle_bars(trade): #TBD
             print('handle_trades', trade.price)
