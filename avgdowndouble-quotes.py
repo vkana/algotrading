@@ -26,7 +26,7 @@ class My(object):
         self.target_price = 0.05
         self.start_equity = 0
         self.last_equity = 0
-        self.live = True
+        self.live = False
 
         if self.live:
             self.base_url = constants.base_url_live
