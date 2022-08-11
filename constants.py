@@ -10,3 +10,7 @@ base_url_live = 'https://api.alpaca.markets'
 #dear.venumadhav@gmail.com
 ALPACA_API_KEY2 = "PKB97SPJRL9JL90D7ZQR"
 ALPACA_SECRET_KEY2 = "YvmDUETetE3xSH2DojMlFpEbHYzepWVThWfe5oFz"
+#dearvenumadhav+1@gmail.com
+ALPACA_API_KEY3 = "PKFJ6DZPJ4N2AY49XGS3"
+ALPACA_SECRET_KEY3 = "JDfI4ud5DvD1ZWQQJjPOqjCKNMRd2PtkImh0poYY"
+
