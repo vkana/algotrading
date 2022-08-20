@@ -9,6 +9,7 @@ from datetime import datetime, tzinfo
 import pandas as pd
 import time
 import asyncio
+import backtrader as bt
 
 key = constants.ALPACA_API_KEY4
 secret = constants.ALPACA_SECRET_KEY4
@@ -20,6 +21,13 @@ trading_client = TradingClient(key, secret, paper = True)
 
 #assets = trading_client.get_all_assets(filter= GetAssetsRequest(asset_class=AssetClass.CRYPTO))
 #print(assets)
+
+class SmaCross(bt.SignalStrategy):
+  def __init__(self) -> None:
+    sma1, sma2 = bt.ind.SMA(period=1), bt.ind.SMA(period=2)
+    crossover = bt.ind.crossover(sma1, sma2)
+    self.close = self.data.close
+    
 
 class My(object):
   def __init__(self):
