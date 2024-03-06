@@ -50,6 +50,7 @@ class BuytheDip(object):
 
     def start_trading(self):
         print(f'start trading')
+        self.api.get_clock()
         conn = Stream(
             self.key_id,
             self.secret_key,

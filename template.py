@@ -1,7 +1,8 @@
 from alpaca.trading.client  import TradingClient
 from alpaca.data.historical import StockHistoricalDataClient
 from alpaca.data.requests import StockLatestQuoteRequest, StockLatestTradeRequest
-from alpaca.data.live import StockDataStream
+from alpaca.data.live import StockDataStream, CryptoDataStream
+from alpaca.trading.stream import TradingStream
 from alpaca.trading.requests import GetAssetsRequest
 from alpaca.trading.enums import AssetClass
 import constants
@@ -9,17 +10,15 @@ from datetime import datetime, tzinfo
 import pandas as pd
 import time
 import asyncio
+import concurrent.futures
+
 
 key = constants.ALPACA_API_KEY4
 secret = constants.ALPACA_SECRET_KEY4
-symbols = ('TQQQ', 'SQQQ',)
+symbols = ('ETHUSD','BTCUSD', 'DOGEUSD')
 trading_client = TradingClient(key, secret, paper = True)
-#client = StockHistoricalDataClient(key, secret)
-# data = client.get_stock_latest_trade(StockLatestTradeRequest(symbol_or_symbols = symbols ))
-# print(data)
-
-#assets = trading_client.get_all_assets(filter= GetAssetsRequest(asset_class=AssetClass.CRYPTO))
-#print(assets)
+ws = CryptoDataStream(key, secret)
+ts = TradingStream(key, secret, paper = True)
 
 class My(object):
   def __init__(self):
@@ -33,64 +32,30 @@ class My(object):
     for symbol in symbols:
       self.output[symbol] = {'b':0, 'a': 0, 't': 0}
 
-    # def get_account():
-    #   x = trading_client.get_account()
-    #   y = trading_client.get_clock().is_open
-    #   z = trading_client.get_clock().timestamp.second
-    #   min = datetime.now().time().minute
-    #   if min != self.minute:
-    #     self.count = 0
-    #     self.minute = min
-        
-      
-    #   print(f'calls: {datetime.now().time()} {self.count} {y} {z}')
-    #   self.count += 3
-    # self.minute = datetime.now().time().minute
-    # while (True):
-    #   get_account()
-
     async def quote_handler(data):
-      
+      print('quote_handler......')
       self.output[data.symbol]['b'] = data.bid_price
       self.output[data.symbol]['a'] = data.ask_price
       print(f'{datetime.now().time()} {self.output}')
       
-      #print(data.symbol, data.bid_price, data.ask_price)
-        #print(f'{datetime.now().time()} quote {data.symbol} bid: {data.bid_price} ask: {data.ask_price}')
-        #pass
-      
     async def trade_handler(data):
       self.output[data.symbol]['t'] = data.price
-      #print(f'{datetime.now().time()} {self.output}')
+
+    async def trade_update_handler(data):
+      print(data)
 
     async def bar_handler(data):
       print(data)
     
-    ws = StockDataStream(key, secret)
-    ws.subscribe_trades(trade_handler, *symbols)
+    
     ws.subscribe_quotes(quote_handler, *symbols)
-    # ws.subscribe_bars(bar_handler, *symbols)
-    ws.run()
-
-    # a = [38.05, 38, 37.95, 37.90]
-    # b = [10, 10, 20, 40]
-
-    # df = pd.DataFrame({'price':a, 'qty': b})
-    # df['cost_basis'] = df['price'] * df['qty']
-    # avg = df.sum(axis=0)
-    # print(df)
-    # print(avg['cost_basis']/avg['qty'])
-
-    # clock = trading_client.get_clock()
-    # next_open = clock.next_open
-    # now = datetime.now(tz=next_open.tzinfo)
-    # if not clock.is_open:
-    #   secs = (next_open - now).total_seconds()
-    #   print('sleeping until market open..')
-    #   print(next_open, now, (next_open - now).total_seconds())
-    #   time.sleep(secs)
-      
-    #  pass
+    ts.subscribe_trade_updates(trade_update_handler)
+    ws.subscribe_trades(trade_handler, *symbols)
+    #ws.subscribe_bars(bar_handler, *symbols)
+    
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+            executor.submit(ts.run)
+            executor.submit(ws.run)
     
     
 

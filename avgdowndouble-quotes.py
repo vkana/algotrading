@@ -27,7 +27,7 @@ class My(object):
         self.target_price = 0.05
         self.start_equity = 0
         self.last_equity = 0
-        self.live = True
+        self.live = False
         self.now = ''
 
         if self.live:
@@ -44,8 +44,7 @@ class My(object):
         self.conn = Stream(
             self.key_id,
             self.secret_key,
-            base_url = self.base_url,
-            data_feed = 'iex'
+            base_url = self.base_url
             #,websocket_params =  {'ping_interval': 1}
         )
     
@@ -55,13 +54,13 @@ class My(object):
         last_price = position.last_price
         diff = 0
         try:
-            diff = exp.index(position.qty/10) / 100
+            diff = exp.index(position.qty/initial_qty) / 100
         except:
-            pass
-
-        #print(f'diff={diff}')
+            for e in exp:
+                if position.qty/initial_qty > e:
+                    diff += 1
         
-        if last_price == 0 or ask_price < last_price - self.target_price - diff:
+        if last_price == 0 or ask_price <= last_price - self.target_price - diff:
             #print(f'{symbol} buy condition {last_price} == 0 or  {ask_price}  < {last_price - self.target_price - diff}')
             if float(self.api.get_account().regt_buying_power) < ask_price * position.qty:
                 print(f'{self.now} {symbol} {ask_price} {position.entry_price} {position.qty} No buying power. Skipping..')
@@ -79,10 +78,8 @@ class My(object):
                 print('after exception -', symbol, position.last_price)
             return
         
-        if position.qty_available > 0 and bid_price > position.entry_price + self.target_price:
-            #print(f'{symbol} sell condition {position.qty_available} > 0 and  {bid_price} > {position.entry_price + self.target_price}')
+        if position.qty_available > 0 and bid_price >= position.entry_price + self.target_price:
             try:
-                #self.api.submit_order(symbol, position.qty_available, 'sell', 'market', 'day')
                 self.api.close_position(symbol)
                 #reset
                 position.last_price = 0
@@ -102,7 +99,7 @@ class My(object):
             time.sleep(secs)
 
     def start_trading(self):
-        self.check_market_open()
+        #self.check_market_open()
         print(f'Start trading.. live={self.live}')
         account = self.api.get_account()
         self.last_equity = float(account.last_equity)
@@ -125,7 +122,7 @@ class My(object):
 
         async def handle_trades(trade):
             self.now = datetime.now().time().strftime('%H:%M:%S')
-            self.process_trade(trade.symbol, float(trade.price), float(trade.price))
+            self.process_trade(trade.symbol, float(trade.bid_price), float(trade.ask_price))
 
         async def handle_trade_updates(data):
             if data.event == 'fill' or data.event == 'partial_fill':
@@ -157,7 +154,7 @@ class My(object):
         async def handle_crypto(crypto): #TBD
             print('handle_crypto', crypto)
 
-        self.conn.subscribe_trades(handle_trades, *self.stocks)
+        self.conn.subscribe_quotes(handle_trades, *self.stocks)
         self.conn.subscribe_trade_updates(handle_trade_updates)
         #self.conn.subscribe_news(handle_news, *self.stocks)
         #self.conn.subscribe_crypto_trades(handle_trades, *self.stocks)
