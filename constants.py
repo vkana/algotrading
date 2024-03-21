@@ -7,7 +7,7 @@ ALPACA_API_KEY_LIVE = "AKVEQLIM19K919OA1BPO"
 ALPACA_SECRET_KEY_LIVE = "Hu7ReLjcf8D1yhJNOOIoZm6c4TQstMi76huwDf15"
 base_url_live = 'https://api.alpaca.markets'
 
-#c
+#dear.venumadhav@gmail.com Million$1234
 ALPACA_API_KEY2 = "PKL7N8D28R93GYBU2841"
 ALPACA_SECRET_KEY2 = "d5a2GDC9iFpxLAvT5xgtfuCCvSRIGrfVtbpSYBNy"
 #dearvenumadhav+1@gmail.com Passw0rd123$
