@@ -9,10 +9,6 @@ import time
 import concurrent.futures
 from threading import Event
 import winsound
-import logging
-
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s',handlers=[logging.FileHandler("trades.log"), logging.StreamHandler()])
-logger = logging.getLogger(__name__)
 
 
 initial_qty = 10
@@ -69,7 +65,7 @@ class My(object):
                 buying_power = 30000;
                 
             if buying_power < ask_price * position.qty:
-                logger.info(f'{symbol} {ask_price} {position.entry_price} {position.qty} No buying power. Skipping..')
+                print(f'{self.now} {symbol} {ask_price} {position.entry_price} {position.qty} No buying power. Skipping..')
                 #avoid get_account call repeatedly
                 position.last_price = ask_price
                 return
@@ -80,8 +76,8 @@ class My(object):
                 self.trading_client.submit_order(order_data=MarketOrderRequest(symbol=symbol, qty=position.qty, side=OrderSide.BUY, time_in_force=TimeInForce.DAY))
                 winsound.Beep(2500,10)
             except Exception as e:
-                logger.error(f'{symbol} {ask_price} {position.entry_price} {position.qty} {e}')
-                logger.error(f'After exception - {symbol} {position.last_price}')
+                print(symbol, ask_price, position.entry_price, position.qty,  e)
+                print('after exception -', symbol, position.last_price)
             return
         
         if position.qty_available > 0 and bid_price >= position.entry_price + self.target_price:
@@ -96,7 +92,7 @@ class My(object):
                 position.qty_available = 0
                 position.qty = initial_qty
             except Exception as e:
-                logger.error(f'{symbol} {e}')
+                print(symbol, e)
 
     def check_market_open(self):
         clock = self.trading_client.get_clock()
@@ -105,7 +101,7 @@ class My(object):
             next_open = clock.next_open
             now = datetime.now(tz=next_open.tzinfo)
             secs = (next_open - now).total_seconds()
-            logger.info('Sleeping until market open..')
+            print('Sleeping until market open..')
             time.sleep(secs+5)
     
     def check_market_close(self):
@@ -115,7 +111,7 @@ class My(object):
             now = datetime.now(tz=next_close.tzinfo)
             #next_close = datetime.now(tz=now.tzinfo)+timedelta(seconds=75)
             secs = (next_close - now).total_seconds()
-            logger.info('Waiting until market close time..')
+            print('waiting until market close time..')
             time.sleep(secs-30)
     
     def stop_trading(self):
@@ -123,25 +119,25 @@ class My(object):
         self.ts.stop()
         self.ws.stop()
         orders = self.trading_client.get_orders(GetOrdersRequest(symbols=self.stocks))
-        logger.info('Cancelling pending orders..')
+        print('Cancelling pending orders..')
         for order in orders:
             try:
                 self.trading_client.cancel_order_by_id(order.id)
-                logger.info(f'Cancel {symbol} {order.id}')
+                print(f'cancel {symbol} {order.id}')
             except:
                 pass
-        logger.info('Submitting target orders for open positions')
+        print('submitting target orders for open positions')
         for symbol in self.stocks:
             try:
                 position = self.positions[symbol]
                 order = self.trading_client.submit_order(LimitOrderRequest(symbol=symbol, qty=position.qty_available, side='sell',limit_price = round(position.entry_price + self.target_price,2), time_in_force='day', extended_hours=True))
-                logger.info(f'Sell limit {symbol} {position.qty_available} {order.id}')
+                print(f'sell limit {symbol} {position.qty_available} {order.id}')
             except:
                 pass
 
 
     def start_trading(self):
-        logger.info(f'Start trading.. live={self.live}')
+        print(f'Start trading.. live={self.live}')
         self.check_market_open()
         account = self.trading_client.get_account()
         self.last_equity = float(account.last_equity)
@@ -157,11 +153,11 @@ class My(object):
                 position.last_price = position.entry_price
                 position.qty_available = int(acct_position.qty)
                 position.qty = position.qty_available
-                logger.info(f'Existing position: {symbol} {position.qty} {position.last_price}')
+                print(f'Existing position: {symbol} {position.qty} {position.last_price}')
             except Exception as e:
                 position.entry_price = 0
                 position.qty_available = 0
-                logger.error(f'Exception start_trading: {e}')
+                print('Exception s_t:', e)
 
         async def handle_quotes(data):
             now = datetime.now()
@@ -193,13 +189,13 @@ class My(object):
                     position.qty = initial_qty
                     position.last_price = 0
                 
-                logger.info(f'{self.now} {side} {symbol} {round(float(price),2)} / {round(position.entry_price, 2)} qty: {data.qty} / {position.qty_available}  PnL: ${round(current_equity - self.start_equity, 2)} / ${round(current_equity - self.last_equity, 2)} {"partial" if data.event == "partial_fill" else ""}')
+                print(f'{self.now} {side} {symbol} {round(float(price),2)} / {round(position.entry_price, 2)} qty: {data.qty} / {position.qty_available}  PnL: ${round(current_equity - self.start_equity, 2)} / ${round(current_equity - self.last_equity, 2)} {"partial" if data.event == "partial_fill" else ""}')
 
         async def handle_bars(trade): #TBD
-            print('handle_bars', trade.price)
+            print('handle_trades', trade.price)
 
         async def handle_news(news): #TBD
-            print('handle_news', news)
+            print('handle_trades', news)
         
         async def handle_crypto(crypto): #TBD
             print('handle_crypto', crypto)
