@@ -1,8 +1,8 @@
 import logging
-import winsound
 import concurrent.futures
 from datetime import datetime, timedelta
 import time
+import platform
 from alpaca.trading.client import TradingClient
 from alpaca.data.live import StockDataStream
 from alpaca.trading.stream import TradingStream
@@ -11,18 +11,23 @@ from alpaca.trading.requests import (MarketOrderRequest, ClosePositionRequest,
 from alpaca.trading.enums import OrderSide, TimeInForce
 import constants
 
-
+try:
+    import winsound
+except ImportError:
+    pass
 
 #from threading import Event
 
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s',
+#%(funcName)s 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(funcName)s %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
     handlers=[logging.FileHandler("trades.log"), logging.StreamHandler()])
 logger = logging.getLogger(__name__)
 
 
 INITIAL_QTY = 10
 exp = [1<<exponent for exponent in range(20)]
+
 
 class Position:
     def __init__(self):
@@ -36,7 +41,7 @@ class My:
     def __init__(self):
         self.stocks = ('TQQQ','SQQQ')
         self.positions = {}
-        self.target_price = 0.0512
+        self.target_price = 0.05
         self.start_equity = 0
         self.last_equity = 0
         self.now = ''
@@ -80,7 +85,8 @@ class My:
                 position.last_price = ask_price
                 self.last_order_time = datetime.now()
                 self.trading_client.submit_order(order_data=MarketOrderRequest(symbol=symbol, qty=position.qty, side=OrderSide.BUY, time_in_force=TimeInForce.DAY))
-                winsound.Beep(2500,10)
+                if platform.system() == 'Windows':
+                    winsound.Beep(2500,10)
             except Exception as e:
                 logger.error(f'{symbol} {ask_price} {position.entry_price} {position.qty} {e}')
                 logger.error(f'After exception - {symbol} {position.last_price}')
@@ -92,7 +98,8 @@ class My:
                 #self.trading_client.submit_order(symbol, position.qty_available, 'sell', 'market', 'day')
                 self.last_order_time = datetime.now()
                 self.trading_client.close_position(symbol, close_options=ClosePositionRequest(percentage='100'))
-                winsound.Beep(1000,10)
+                if platform.system() == 'Windows':
+                    winsound.Beep(1000,10)
                 #reset
                 position.last_price = 0
                 position.qty_available = 0
@@ -107,7 +114,7 @@ class My:
             next_open = clock.next_open
             now = datetime.now(tz=next_open.tzinfo)
             secs = (next_open - now).total_seconds()
-            logger.info('Sleeping until market open..')
+            logger.info('Waiting until market open..')
             time.sleep(secs+5)
 
     def check_market_close(self):
@@ -136,7 +143,7 @@ class My:
         for symbol in self.stocks:
             try:
                 position = self.positions[symbol]
-                order = self.trading_client.submit_order(LimitOrderRequest(symbol=symbol, qty=position.qty_available, side='sell',limit_price = round(position.entry_price + self.target_price,2), time_in_force='day', extended_hours=True))
+                order = self.trading_client.submit_order(LimitOrderRequest(symbol=symbol, qty=position.qty_available, side=OrderSide.SELL,limit_price = round(position.entry_price + self.target_price,2), time_in_force=TimeInForce.DAY, extended_hours=True))
                 logger.info(f'Sell limit {symbol} {position.qty_available} {order.id}')
             except:
                 pass
@@ -194,8 +201,10 @@ class My:
                     position.qty = INITIAL_QTY
                     position.last_price = 0
 
-                logger.info(f'{side} {symbol} {round(float(price),2)} / {round(position.entry_price, 2)} qty: {data.qty} / {position.qty_available}  PnL: ${round(current_equity - self.start_equity, 2)} / ${round(current_equity - self.last_equity, 2)} {"partial" if data.event == "partial_fill" else ""}')
-
+                logger.info(f'{side.name} {symbol} {round(float(price),2)} / {round(position.entry_price, 2)} qty: {data.qty} / {position.qty_available}  PnL: ${round(current_equity - self.start_equity, 2)} / ${round(current_equity - self.last_equity, 2)} {"partial" if data.event == "partial_fill" else ""}')
+                # logger.info('%s %s %.2f / %.2f qty: %d / %d PnL: %.2f / %.2f %s', side, symbol, round(float(price),2),
+                #     round(position.entry_price, 2), data.qty, position.qty_available, round(current_equity - self.start_equity, 2), 
+                #     round(current_equity - self.last_equity, 2), "partial" if data.event == "partial_fill" else "")
         # async def handle_bars(trade): #TBD
         #     print('handle_bars', trade.price)
 
