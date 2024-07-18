@@ -127,11 +127,8 @@ class My:
             logger.info('Waiting until market close time..')
             time.sleep(secs-30)
 
-    def stop_trading(self):
-        self.check_market_close()
-        self.ts.stop()
-        self.ws.stop()
-        orders = self.trading_client.get_orders(GetOrdersRequest(symbols=self.stocks))
+    def cancel_pending_orders(self, symbols):
+        orders = self.trading_client.get_orders(GetOrdersRequest(symbols=symbols))
         logger.info('Cancelling pending orders..')
         for order in orders:
             try:
@@ -139,19 +136,29 @@ class My:
                 logger.info(f'Cancel {order.symbol} {order.id}')
             except:
                 pass
+    
+    def submit_target_orders(self, symbols):
         logger.info('Submitting target orders for open positions')
-        for symbol in self.stocks:
+        for symbol in symbols:
             try:
                 position = self.positions[symbol]
-                order = self.trading_client.submit_order(LimitOrderRequest(symbol=symbol, qty=position.qty_available, side=OrderSide.SELL,limit_price = round(position.entry_price + self.target_price,2), time_in_force=TimeInForce.DAY, extended_hours=True))
-                logger.info(f'Sell limit {symbol} {position.qty_available} {order.id}')
+                limit_price = round(position.entry_price + self.target_price,2)
+                order = self.trading_client.submit_order(LimitOrderRequest(symbol=symbol, qty=position.qty_available, side=OrderSide.SELL,limit_price = limit_price, time_in_force=TimeInForce.DAY, extended_hours=True))
+                logger.info(f'Sell limit {symbol} {position.qty_available} {limit_price}')
             except:
                 pass
-
+    
+    def stop_trading(self):
+        self.check_market_close()
+        self.ts.stop()
+        self.ws.stop()
+        self.cancel_pending_orders(self.stocks)
+        self.submit_target_orders(self.stocks)
 
     def start_trading(self):
         logger.info(f'Start trading.. live={self.live}')
         self.check_market_open()
+        self.cancel_pending_orders(self.stocks)
         account = self.trading_client.get_account()
         self.last_equity = float(account.last_equity)
         self.start_equity = float(account.equity)
