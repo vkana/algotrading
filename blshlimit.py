@@ -229,7 +229,7 @@ class Trader:
                         
                         self.next_entry(symbol, QTY, floor2(entry_price - TARGET))
                         
-                        logger.info('+ %-4s %s %s PL %s/%s', symbol, acct_position.qty, ceil2(acct_position.avg_entry_price), current_pl, todays_pl)
+                        logger.info('+ %-4s %s %s/%s PL %s/%s', symbol, acct_position.qty, ceil2(entry_price), ceil2(acct_position.avg_entry_price), current_pl, todays_pl)
                         
                     elif data.order.side == OrderSide.SELL:
                         self.positions[symbol].sell_order_id = ''
@@ -239,7 +239,7 @@ class Trader:
                         except Exception as e:
                             logger.error('%s %s %s', symbol, e, e.__traceback__.tb_lineno)
                         self.fresh_entry(symbol)
-                        logger.info('- %-4s %s %s PL %s/%s', symbol, int(data.position_qty), data.price, current_pl, todays_pl)
+                        logger.info('- %-4s %s %s PL %s/%s', symbol, int(data.qty), data.price, current_pl, todays_pl)
                 except Exception as e:
                     logger.error('%s %s %s', symbol, e, e.__traceback__.tb_lineno)
 
