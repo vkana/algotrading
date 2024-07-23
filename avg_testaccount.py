@@ -106,6 +106,23 @@ class My:
                 position.qty = INITIAL_QTY
             except Exception as e:
                 logger.error(f'{symbol} {e}')
+    
+    def get_positions(self):
+        for symbol in self.stocks:
+            self.positions[symbol] = Position()
+            position = self.positions[symbol]
+            try:
+                acct_position = self.trading_client.get_open_position(symbol)
+                #if position exists on start
+                position.entry_price = float(acct_position.avg_entry_price)
+                position.last_price = position.entry_price
+                position.qty_available = int(acct_position.qty)
+                position.qty = position.qty_available
+                logger.info(f'Existing position: {symbol} {position.qty} {position.last_price}')
+            except Exception as e:
+                position.entry_price = 0
+                position.qty_available = 0
+                logger.error(f'Exception start_trading: {e}')
 
     def check_market_open(self):
         clock = self.trading_client.get_clock()
@@ -115,7 +132,7 @@ class My:
             now = datetime.now(tz=next_open.tzinfo)
             secs = (next_open - now).total_seconds()
             logger.info('Waiting until market open..')
-            time.sleep(secs+5)
+            time.sleep(secs + 5)
 
     def check_market_close(self):
         clock = self.trading_client.get_clock()
@@ -142,42 +159,35 @@ class My:
         for symbol in symbols:
             try:
                 position = self.positions[symbol]
-                limit_price = round(position.entry_price + self.target_price,2)
-                order = self.trading_client.submit_order(LimitOrderRequest(symbol=symbol, qty=position.qty_available, side=OrderSide.SELL,limit_price = limit_price, time_in_force=TimeInForce.DAY, extended_hours=True))
-                logger.info(f'Sell limit {symbol} {position.qty_available} {limit_price}')
-            except:
-                pass
+                orders = self.trading_client.get_orders(GetOrdersRequest(symbols = [symbol], side = OrderSide.SELL, status= 'open'))
+                if not orders:
+                    limit_price = round(position.entry_price + self.target_price,2)
+                    self.trading_client.submit_order(LimitOrderRequest(symbol=symbol, qty=position.qty_available, side=OrderSide.SELL,limit_price = limit_price, time_in_force=TimeInForce.DAY, extended_hours=True))
+                    logger.info(f'Sell limit {symbol} {position.qty_available} {limit_price}')
+            except Exception as e:
+                logger.error(e.__traceback__.tb_lineno)
     
     def stop_trading(self):
         self.check_market_close()
         self.ts.stop()
         self.ws.stop()
-        self.cancel_pending_orders(self.stocks)
         self.submit_target_orders(self.stocks)
 
     def start_trading(self):
         logger.info(f'Start trading.. live={self.live}')
+        self.get_positions()
+        
+        if not self.trading_client.get_clock().is_open:
+            self.submit_target_orders(self.stocks)
+        
         self.check_market_open()
         self.cancel_pending_orders(self.stocks)
         account = self.trading_client.get_account()
         self.last_equity = float(account.last_equity)
         self.start_equity = float(account.equity)
 
-        for symbol in self.stocks:
-            self.positions[symbol] = Position()
-            position = self.positions[symbol]
-            try:
-                acct_position = self.trading_client.get_open_position(symbol)
-                #if position exists on start
-                position.entry_price = float(acct_position.avg_entry_price)
-                position.last_price = position.entry_price
-                position.qty_available = int(acct_position.qty)
-                position.qty = position.qty_available
-                logger.info(f'Existing position: {symbol} {position.qty} {position.last_price}')
-            except Exception as e:
-                position.entry_price = 0
-                position.qty_available = 0
-                logger.error(f'Exception start_trading: {e}')
+        
+
 
         async def handle_quotes(data):
             now = datetime.now()
