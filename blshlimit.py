@@ -136,7 +136,6 @@ class Trader:
 
         if next_open is not None:
             next_open = tz.localize(next_open) - timedelta(minutes=330)
-            print('next_open', next_open, 'now', now)
             secs = (next_open - now).total_seconds()
             logger.info(f'Waiting {secs} seconds until market open..')
             time.sleep(secs)
