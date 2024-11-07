@@ -91,10 +91,7 @@ class My:
                 logger.error(f'{symbol} {ask_price} {position.entry_price} {position.qty} {e}')
                 logger.error(f'After exception - {symbol} {position.last_price}')
             return
-        #temp_code remove later
-        if (symbol == 'TQQQ' and position.qty_available == 656):
-            position.entry_price = 79.56
-
+        
         if position.qty_available > 0 and bid_price >= position.entry_price + self.target_price:
             #print(f'{symbol} sell condition {position.qty_available} > 0 and  {bid_price} > {position.entry_price + self.target_price}')
             try:
@@ -164,11 +161,7 @@ class My:
                 position = self.positions[symbol]
                 orders = self.trading_client.get_orders(GetOrdersRequest(symbols = [symbol], side = OrderSide.SELL, status= 'open'))
                 if not orders:
-                    #temp_code remove later
-                    if (symbol == 'TQQQ' and position.qty_available == 656):
-                        limit_price = 79.61
-                    else:
-                        limit_price = round(position.entry_price + self.target_price,2)
+                    limit_price = round(position.entry_price + self.target_price,2)
 
                     self.trading_client.submit_order(LimitOrderRequest(symbol=symbol, qty=position.qty_available, side=OrderSide.SELL,limit_price = limit_price, time_in_force=TimeInForce.DAY, extended_hours=True))
                     logger.info(f'Sell limit {symbol} {position.qty_available} {limit_price}')
