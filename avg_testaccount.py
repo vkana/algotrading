@@ -122,7 +122,7 @@ class My:
             except Exception as e:
                 position.entry_price = 0
                 position.qty_available = 0
-                logger.error(f'Exception start_trading: {e} {e.__traceback__.tb_lineno}')
+                logger.error(f'Exception : {symbol} {e} {e.__traceback__.tb_lineno}')
 
     def check_market_open(self):
         clock = self.trading_client.get_clock()
@@ -159,7 +159,7 @@ class My:
         for symbol in symbols:
             try:
                 position = self.positions[symbol]
-                if position:
+                if position and position.qty_available > 0:
                     orders = self.trading_client.get_orders(GetOrdersRequest(symbols = [symbol], side = OrderSide.SELL, status= 'open'))
                     if not orders:
                         limit_price = round(position.entry_price + self.target_price,2)
