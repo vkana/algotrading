@@ -68,8 +68,8 @@ class Trader:
             try:
                 self.trading_client.cancel_order_by_id(order.id)
             except Exception as e:
-                logger.error('Unable to cancel open order %s %s %s %s', symbol, order.id, order.type, order.side, e)
-                logger.error('%s %s', symbol, e)
+                logger.error('Unable to cancel open order %s %s %s %s', symbol, order.id, order.type, order.side, e, e.__traceback__.tb_lineno)
+                logger.error('%s %s', symbol, e, e.__traceback__.tb_lineno)
 
     def next_entry(self, symbol, qty, price):
         try :
@@ -94,7 +94,7 @@ class Trader:
             
             logger.debug('%s %s %s %s %s %s', order.symbol, order.side.name, order.limit_price or "", order.qty, order.order_type.name, order.status.name)
         except Exception as e:
-            logger.error('%s %s %s %s', symbol, e, e.__traceback__.tb_lineno, order_request)
+            logger.error('%s %s %s %s', symbol, e, e.__traceback__.tb_lineno, order_request, e.__traceback__.tb_lineno)
 
     def target_order(self, symbol, qty, price):
         try :
@@ -102,7 +102,7 @@ class Trader:
             self.positions[symbol].sell_order_id = order.id
             logger.debug('%s %s %s %s %s %s', order.symbol, order.side.name, order.limit_price or "", order.qty, order.order_type.name, order.status.name)
         except Exception as e:
-            logger.error('%s %s', symbol, e)
+            logger.error('%s %s', symbol, e, e.__traceback__.tb_lineno)
 
     
     def replace_order(self, symbol, order_id, qty, price):
@@ -112,7 +112,7 @@ class Trader:
             self.positions[symbol].sell_order_id = order.id
             logger.debug('%s %s %s %s %s %s', order.symbol, order.side.name, order.limit_price or "", order.qty, order.order_type.name, order.status.name)
         except Exception as e:
-            logger.error('%s %s', symbol, e)
+            logger.error('%s %s', symbol, e, e.__traceback__.tb_lineno)
     
 
     def check_market_open(self):

@@ -88,8 +88,8 @@ class My:
                 if platform.system() == 'Windows':
                     winsound.Beep(2500,10)
             except Exception as e:
-                logger.error(f'{symbol} {ask_price} {position.entry_price} {position.qty} {e}')
-                logger.error(f'After exception - {symbol} {position.last_price}')
+                logger.error(f'{symbol} {ask_price} {position.entry_price} {position.qty} {e} {e.__traceback__.tb_lineno}') 
+                logger.error(f'After exception - {symbol} {position.last_price} {e.__traceback__.tb_lineno}')
             return
         
         if position.qty_available > 0 and bid_price >= position.entry_price + self.target_price:
@@ -105,7 +105,7 @@ class My:
                 position.qty_available = 0
                 position.qty = INITIAL_QTY
             except Exception as e:
-                logger.error(f'{symbol} {e}')
+                logger.error(f'{symbol} {e} {e.__traceback__.tb_lineno}')
     
     def get_positions(self):
         for symbol in self.stocks:
@@ -122,7 +122,7 @@ class My:
             except Exception as e:
                 position.entry_price = 0
                 position.qty_available = 0
-                logger.error(f'Exception start_trading: {e}')
+                logger.error(f'Exception start_trading: {e} {e.__traceback__.tb_lineno}')
 
     def check_market_open(self):
         clock = self.trading_client.get_clock()
