@@ -159,12 +159,13 @@ class My:
         for symbol in symbols:
             try:
                 position = self.positions[symbol]
-                orders = self.trading_client.get_orders(GetOrdersRequest(symbols = [symbol], side = OrderSide.SELL, status= 'open'))
-                if not orders:
-                    limit_price = round(position.entry_price + self.target_price,2)
+                if position:
+                    orders = self.trading_client.get_orders(GetOrdersRequest(symbols = [symbol], side = OrderSide.SELL, status= 'open'))
+                    if not orders:
+                        limit_price = round(position.entry_price + self.target_price,2)
 
-                    self.trading_client.submit_order(LimitOrderRequest(symbol=symbol, qty=position.qty_available, side=OrderSide.SELL,limit_price = limit_price, time_in_force=TimeInForce.DAY, extended_hours=True))
-                    logger.info(f'Sell limit {symbol} {position.qty_available} {limit_price}')
+                        self.trading_client.submit_order(LimitOrderRequest(symbol=symbol, qty=position.qty_available, side=OrderSide.SELL,limit_price = limit_price, time_in_force=TimeInForce.DAY, extended_hours=True))
+                        logger.info(f'Sell limit {symbol} {position.qty_available} {limit_price}')
             except Exception as e:
                 logger.error(f'{symbol} {e} {e.__traceback__.tb_lineno}')
     
