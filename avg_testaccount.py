@@ -184,12 +184,10 @@ class My:
         
         self.check_market_open()
         self.cancel_pending_orders(self.stocks)
+        self.get_positions()    #to get latest positions start of day
         account = self.trading_client.get_account()
         self.last_equity = float(account.last_equity)
         self.start_equity = float(account.equity)
-
-        
-
 
         async def handle_quotes(data):
             now = datetime.now()
