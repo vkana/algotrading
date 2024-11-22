@@ -33,7 +33,7 @@ class Position:
 
 class Trader:
     def __init__(self):
-        self.symbols = ('TSLA','TQQQ', 'INTC', 'SPY', 'AMD',)
+        self.symbols = ('F', 'SOFI', 'CLSK', 'PBR', 'LUNR', 'NU', 'RIOT', 'SNAP', 'RIVN', 'WBD',)
         self.live = False
         self.start_equity = 0
         self.positions = {}
