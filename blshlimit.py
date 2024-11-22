@@ -17,8 +17,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)-5s %(fu
     handlers=[logging.FileHandler("trades_blshlimit.log"),logging.StreamHandler()])
 logger = logging.getLogger(__name__)
 
-QTY = 1
-TARGET = 0.10
+QTY = 5
+TARGET = 0.02
 
 def ceil2 (number):
     return math.ceil(float(number) * 100) / 100
