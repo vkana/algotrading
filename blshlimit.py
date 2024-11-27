@@ -33,7 +33,8 @@ class Position:
 
 class Trader:
     def __init__(self):
-        self.symbols = ('F', 'SOFI', 'CLSK', 'PBR', 'LUNR', 'NU', 'RIOT', 'SNAP', 'RIVN', 'WBD',)
+        self.symbols = ('F', 'SOFI', 'CLSK', 'PBR', 'LUNR', 'NU', 'RIOT', 'SNAP', 'RIVN', 'WBD', 'AMD',)
+        self.symbols_exit = ('AMD',)
         self.live = False
         self.start_equity = 0
         self.positions = {}
@@ -196,7 +197,8 @@ class Trader:
                 logger.error('%s %s %s',symbol, e, e.__traceback__.tb_lineno)
                 self.cancel_open_orders(symbol)
                 #print('processing 3', symbol)
-                self.fresh_entry(symbol)
+                if (symbol not in self.symbols_exit):
+                    self.fresh_entry(symbol)
 
     def start_trading(self):
         self.check_market_open()
@@ -237,7 +239,8 @@ class Trader:
                             self.trading_client.cancel_order_by_id(self.positions[symbol].buy_order_id)
                         except Exception as e:
                             logger.error('%s %s %s', symbol, e, e.__traceback__.tb_lineno)
-                        self.fresh_entry(symbol)
+                        if (symbol not in self.symbols_exit):
+                            self.fresh_entry(symbol)
                         logger.info('- %-4s %s %s PL %s/%s', symbol, int(data.qty), data.price, current_pl, todays_pl)
                 except Exception as e:
                     logger.error('%s %s %s', symbol, e, e.__traceback__.tb_lineno)
