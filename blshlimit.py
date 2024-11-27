@@ -50,6 +50,21 @@ class Trader:
         self.trading_client = TradingClient(self.key_id, self.secret_key, paper = not self.live)
         self.ts = TradingStream(self.key_id, self.secret_key, paper = not self.live)
 
+    def last_entry_price(self, symbol):
+        request_params = GetOrdersRequest(
+            status=QueryOrderStatus.CLOSED,
+            limit=1,
+            symbols=(symbol,),
+            side= OrderSide.BUY
+        )
+        orders = self.trading_client.get_orders(request_params)
+
+        if orders:
+            latest_trade = orders[0]
+            return(latest_trade.limit_price or latest_trade.filled_avg_price)
+        else:
+            return 0
+    
     def get_current_price(self, symbol):
         quote = self.quote_client.get_stock_latest_quote(request_params= StockLatestQuoteRequest(symbol_or_symbols= symbol))
         current_price = quote[symbol].ask_price
@@ -62,15 +77,18 @@ class Trader:
             print(latest_trade)
         return ceil2(current_price)
 
-    def cancel_open_orders(self, symbol):
-        open_orders = self.trading_client.get_orders(GetOrdersRequest(symbols=[symbol], status=QueryOrderStatus.OPEN))
+    def cancel_open_orders(self, symbols):
+        if (isinstance(symbols, str)):
+            symbols_to_cancel = (symbols,)
+        
+        open_orders = self.trading_client.get_orders(GetOrdersRequest(symbols=symbols_to_cancel, status=QueryOrderStatus.OPEN))
         for order in open_orders:
             logger.debug('cancelling %s %s %s %s', len(open_orders), order.symbol, order.status.name, order.side.name)
             try:
                 self.trading_client.cancel_order_by_id(order.id)
             except Exception as e:
-                logger.error('Unable to cancel open order %s %s %s %s', symbol, order.id, order.type, order.side, e, e.__traceback__.tb_lineno)
-                logger.error('%s %s', symbol, e, e.__traceback__.tb_lineno)
+                logger.error('Unable to cancel open order %s %s %s %s', order.symbol, order.id, order.type, order.side, e, e.__traceback__.tb_lineno)
+                logger.error('%s %s', order.symbol, e, e.__traceback__.tb_lineno)
 
     def next_entry(self, symbol, qty, price):
         try :
@@ -99,7 +117,7 @@ class Trader:
 
     def target_order(self, symbol, qty, price):
         try :
-            order = self.trading_client.submit_order(LimitOrderRequest(symbol = symbol, qty = qty, limit_price = price, side = OrderSide.SELL, extended_hours = True, time_in_force = TimeInForce.DAY ))
+            order = self.trading_client.submit_order(LimitOrderRequest(symbol = symbol, qty = qty, limit_price = price, side = OrderSide.SELL, extended_hours = True, time_in_force = TimeInForce.DAY))
             self.positions[symbol].sell_order_id = order.id
             logger.debug('%s %s %s %s %s %s', order.symbol, order.side.name, order.limit_price or "", order.qty, order.order_type.name, order.status.name)
         except Exception as e:
@@ -157,21 +175,15 @@ class Trader:
         self.check_market_close()
         logger.info('Stop trading..')
         self.ts.stop()
-        self.ws.stop()
-        orders = self.trading_client.get_orders(GetOrdersRequest(symbols=self.stocks))
+        orders = self.trading_client.get_orders(GetOrdersRequest(symbols=self.symbols))
         logger.info('Cancelling pending orders..')
-        for order in orders:
-            try:
-                self.trading_client.cancel_order_by_id(order.id)
-                logger.info(f'Cancel {order.symbol} {order.id}')
-            except:
-                pass
+        self.cancel_open_orders(self.symbols)
         logger.info('Submitting target orders for open positions')
-        for symbol in self.stocks:
+    
+        for symbol in self.symbols:
             try:
                 position = self.positions[symbol]
-                order = self.trading_client.submit_order(LimitOrderRequest(symbol=symbol, qty=position.qty_available, side=OrderSide.SELL,limit_price = round(position.entry_price + self.target_price,2), time_in_force=TimeInForce.DAY, extended_hours=True))
-                logger.info(f'Sell limit {symbol} {position.qty_available} {order.id}')
+                self.target_order(symbol=symbol, qty=position.qty_available, price = round(position.entry_price + self.target_price,2))
             except:
                 pass
     
@@ -191,7 +203,8 @@ class Trader:
                 entry_price = float(acct_position.avg_entry_price)
                 qty_available = acct_position.qty_available
                 self.target_order(symbol, qty_available, ceil2(entry_price + TARGET))
-                self.next_entry(symbol, QTY, floor2(float(acct_position.current_price) - TARGET))
+                last_entry = self.last_entry_price(symbol) or acct_position.current_price
+                self.next_entry(symbol, QTY, floor2(float(last_entry) - TARGET))
                 
             except Exception as e:
                 logger.error('%s %s %s',symbol, e, e.__traceback__.tb_lineno)
