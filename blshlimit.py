@@ -183,7 +183,7 @@ class Trader:
         for symbol in self.symbols:
             try:
                 position = self.positions[symbol]
-                self.target_order(symbol=symbol, qty=position.qty_available, price = round(position.entry_price + self.target_price,2))
+                self.target_order(symbol=symbol, qty=position.qty_available, price = round(position.entry_price + TARGET,2))
             except:
                 pass
     
