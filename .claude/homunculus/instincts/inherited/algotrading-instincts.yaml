@@ -1,0 +1,473 @@
+# Instincts generated from https://github.com/vkana/algotrading
+# Generated: 2026-06-09T01:44:43.896Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: algotrading-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/vkana/algotrading
+---
+
+# Algotrading Commit Length
+
+## Action
+
+Keep commit messages concise (~23 characters)
+
+## Evidence
+
+- Average commit message length: 23 chars
+- Based on 44 commits
+
+---
+id: algotrading-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/vkana/algotrading
+---
+
+# Algotrading Naming Files
+
+## Action
+
+Use camelCase naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: camelCase
+
+---
+id: algotrading-import-relative
+trigger: "when importing modules"
+confidence: 0.75
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/vkana/algotrading
+---
+
+# Algotrading Import Relative
+
+## Action
+
+Use relative imports for project files
+
+## Evidence
+
+- Import analysis shows relative import pattern
+- Example: import { x } from '../lib/x'
+
+---
+id: algotrading-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/vkana/algotrading
+---
+
+# Algotrading Export Style
+
+## Action
+
+Prefer named exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: named
+
+---
+id: algotrading-test-separate
+trigger: "when writing tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/vkana/algotrading
+---
+
+# Algotrading Test Separate
+
+## Action
+
+Place tests in the tests/ or __tests__/ directory, mirroring src structure
+
+## Evidence
+
+- Separate test directory pattern detected
+- Tests live in dedicated test folders
+
+---
+id: algotrading-workflow-single-script-feature-or-bugfix
+trigger: "when doing single script feature or bugfix"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/vkana/algotrading
+---
+
+# Algotrading Workflow Single Script Feature Or Bugfix
+
+## Action
+
+Follow the single-script-feature-or-bugfix workflow:
+1. Edit the relevant strategy script file (e.g., blshlimit.py or avg_testaccount.py).
+2. Commit the changes with a descriptive message.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: blshlimit.py, avg_testaccount.py, avgdowndouble-quotes.py
+
+---
+id: algotrading-workflow-multi-script-coordinated-update
+trigger: "when doing multi script coordinated update"
+confidence: 0.55
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/vkana/algotrading
+---
+
+# Algotrading Workflow Multi Script Coordinated Update
+
+## Action
+
+Follow the multi-script-coordinated-update workflow:
+1. Edit multiple strategy script files (e.g., avg_testaccount.py, blshlimit.py).
+2. Optionally update shared files (e.g., constants.py).
+3. Commit all changes together.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~1x per month
+- Files: avg_testaccount.py, blshlimit.py, constants.py
+
+---
+id: algotrading-workflow-add-or-update-gitignore
+trigger: "when doing add or update gitignore"
+confidence: 0.55
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/vkana/algotrading
+---
+
+# Algotrading Workflow Add Or Update Gitignore
+
+## Action
+
+Follow the add-or-update-gitignore workflow:
+1. Edit or create the .gitignore file.
+2. Commit the changes.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~1x per month
+- Files: .gitignore
+
+---
+id: algotrading-workflow-requirements-update
+trigger: "when doing requirements update"
+confidence: 0.55
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/vkana/algotrading
+---
+
+# Algotrading Workflow Requirements Update
+
+## Action
+
+Follow the requirements-update workflow:
+1. Edit or create requirements.txt.
+2. Commit the changes.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~1x per month
+- Files: requirements.txt
+
+---
+id: algotrading-workflow-add-or-update-shell-scripts-and-procfile
+trigger: "when doing add or update shell scripts and procfile"
+confidence: 0.55
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/vkana/algotrading
+---
+
+# Algotrading Workflow Add Or Update Shell Scripts And Procfile
+
+## Action
+
+Follow the add-or-update-shell-scripts-and-procfile workflow:
+1. Edit or create start.sh, stop.sh, or Procfile.
+2. Commit the changes.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~1x per month
+- Files: start.sh, stop.sh, Procfile
+
+---
+id: algotrading-instinct-file-naming-camelCase
+trigger: "When creating or renaming a Python file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: vkana/algotrading
+---
+
+# Algotrading Instinct File Naming CamelCase
+
+## Action
+
+Name the file using camelCase (e.g., avg_testaccount.py, blshlimit.py)
+
+## Evidence
+
+- Pattern in files: blshlimit.py, avg_testaccount.py, avgdowndouble-quotes.py
+
+---
+id: algotrading-instinct-function-naming-camelCase
+trigger: "When defining a new function"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: vkana/algotrading
+---
+
+# Algotrading Instinct Function Naming CamelCase
+
+## Action
+
+Use camelCase for function names
+
+## Evidence
+
+- Pattern in codebase: function naming conventions
+
+---
+id: algotrading-instinct-class-naming-pascalCase
+trigger: "When defining a new class"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: vkana/algotrading
+---
+
+# Algotrading Instinct Class Naming PascalCase
+
+## Action
+
+Use PascalCase for class names
+
+## Evidence
+
+- Pattern in codebase: class naming conventions
+
+---
+id: algotrading-instinct-constant-naming-screaming-snake
+trigger: "When defining a constant"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: vkana/algotrading
+---
+
+# Algotrading Instinct Constant Naming Screaming Snake
+
+## Action
+
+Use SCREAMING_SNAKE_CASE for constant names
+
+## Evidence
+
+- Pattern in codebase: constant naming conventions
+
+---
+id: algotrading-instinct-relative-imports
+trigger: "When importing modules within the package"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: vkana/algotrading
+---
+
+# Algotrading Instinct Relative Imports
+
+## Action
+
+Use relative imports
+
+## Evidence
+
+- Pattern in codebase: relative import style
+
+---
+id: algotrading-instinct-named-exports
+trigger: "When exporting functions or classes from a module"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: vkana/algotrading
+---
+
+# Algotrading Instinct Named Exports
+
+## Action
+
+Use named exports
+
+## Evidence
+
+- Pattern in codebase: named export style
+
+---
+id: algotrading-instinct-test-location-separate
+trigger: "When adding new tests"
+confidence: 0.7
+domain: testing
+source: repo-analysis
+source_repo: vkana/algotrading
+---
+
+# Algotrading Instinct Test Location Separate
+
+## Action
+
+Place test files in a separate location from source code
+
+## Evidence
+
+- Architecture pattern: testLocation is separate
+
+---
+id: algotrading-instinct-commit-message-freeform-short
+trigger: "When making a git commit"
+confidence: 0.85
+domain: git
+source: repo-analysis
+source_repo: vkana/algotrading
+---
+
+# Algotrading Instinct Commit Message Freeform Short
+
+## Action
+
+Write a short, freeform commit message (average length ~23 characters)
+
+## Evidence
+
+- Seen in commits: 'added shell scripts', 'gitignore update', 'exit only position'
+
+---
+id: algotrading-instinct-single-script-feature-or-bugfix
+trigger: "When updating logic or fixing a bug in a specific trading script"
+confidence: 0.95
+domain: workflow
+source: repo-analysis
+source_repo: vkana/algotrading
+---
+
+# Algotrading Instinct Single Script Feature Or Bugfix
+
+## Action
+
+Edit the relevant script (e.g., blshlimit.py), then commit with a descriptive message
+
+## Evidence
+
+- Workflow: single-script-feature-or-bugfix
+- Pattern in files: blshlimit.py, avg_testaccount.py
+
+---
+id: algotrading-instinct-multi-script-coordinated-update
+trigger: "When updating shared logic, logging, or performing code cleanup across several scripts"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: vkana/algotrading
+---
+
+# Algotrading Instinct Multi Script Coordinated Update
+
+## Action
+
+Edit multiple scripts (e.g., avg_testaccount.py, blshlimit.py), optionally update shared files (e.g., constants.py), and commit all changes together
+
+## Evidence
+
+- Workflow: multi-script-coordinated-update
+- Pattern in files: avg_testaccount.py, blshlimit.py, constants.py
+
+---
+id: algotrading-instinct-add-or-update-gitignore
+trigger: "When adding new ignore rules or initializing the .gitignore"
+confidence: 0.95
+domain: workflow
+source: repo-analysis
+source_repo: vkana/algotrading
+---
+
+# Algotrading Instinct Add Or Update Gitignore
+
+## Action
+
+Edit or create the .gitignore file and commit the changes
+
+## Evidence
+
+- Workflow: add-or-update-gitignore
+- Seen in commits: 'gitignore update', 'added gitignore'
+
+---
+id: algotrading-instinct-requirements-update
+trigger: "When adding a new dependency or fixing requirements"
+confidence: 0.95
+domain: workflow
+source: repo-analysis
+source_repo: vkana/algotrading
+---
+
+# Algotrading Instinct Requirements Update
+
+## Action
+
+Edit or create requirements.txt and commit the changes
+
+## Evidence
+
+- Workflow: requirements-update
+
+---
+id: algotrading-instinct-add-or-update-shell-scripts-and-procfile
+trigger: "When adding or modifying deployment/startup scripts"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: vkana/algotrading
+---
+
+# Algotrading Instinct Add Or Update Shell Scripts And Procfile
+
+## Action
+
+Edit or create start.sh, stop.sh, or Procfile and commit the changes
+
+## Evidence
+
+- Workflow: add-or-update-shell-scripts-and-procfile
+- Seen in commits: 'added shell scripts'
+
