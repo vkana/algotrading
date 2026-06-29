@@ -6,7 +6,8 @@ nohup python blshlimit.py > /dev/null 2>&1 &
 # Optionally, save the process ID (PID) to a file
 echo $! > scripts.pid
 
-nohup python avg_testaccount.py > /dev/null 2>&1 &
+#nohup python avg_testaccount.py > /dev/null 2>&1 &
+nohup python roth_strat.py > /dev/null 2>&1 &
 
 echo $! >> scripts.pid
 
