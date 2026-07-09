@@ -126,7 +126,6 @@ class RothStrategy:
             # If an order was filled, submit a new limit order to add to the position.
             symbol = data.order.symbol
             side = data.order.side
-            qty = float(data.order.qty)
             price = float(data.order.filled_avg_price) 
             
             await asyncio.sleep(5)
@@ -134,7 +133,8 @@ class RothStrategy:
 
             if side == "buy":
                 qty = float(self.tc.get_open_position(symbol).qty)
-                self.submit_limit_order(symbol, qty, "sell", float2(price * TARGET_MULTIPLIER))
+                avg_entry_price = float(self.tc.get_open_position(symbol).avg_entry_price)
+                self.submit_limit_order(symbol, qty, "sell", float2(avg_entry_price * TARGET_MULTIPLIER))
                 self.submit_limit_order(symbol, ADD_POSITION, "buy", float2(price * NEXT_ENTRY_MULTIPLIER))
                 
             else:
