@@ -61,7 +61,7 @@ class RothStrategy:
             if position:
                 avg_price = float(position.avg_entry_price)
 
-                print(f"symbol: {symbol}, qty: {position.qty}, side: {position.side}, avg_entry_price: {position.avg_entry_price}")
+                print(f"symbol: {symbol}, qty: {position.qty}, side: {position.side}, avg_entry_price: {float2(avg_price)}")
                 self.submit_limit_order(symbol, float2(position.qty), "sell",  float2(avg_price * TARGET_MULTIPLIER) )
                 
                 if float(position.qty) < MAX_POSITION:
@@ -132,9 +132,10 @@ class RothStrategy:
             self.cancel_orders(symbol)
 
             if side == "buy":
-                qty = float(self.tc.get_open_position(symbol).qty)
-                avg_entry_price = float(self.tc.get_open_position(symbol).avg_entry_price)
-                self.submit_limit_order(symbol, qty, "sell", float2(avg_entry_price * TARGET_MULTIPLIER))
+                position = self.tc.get_open_position(symbol)
+                qty = float(position.qty)
+                avg_price = float(position.avg_entry_price)
+                self.submit_limit_order(symbol, qty, "sell", float2(avg_price * TARGET_MULTIPLIER))
                 self.submit_limit_order(symbol, ADD_POSITION, "buy", float2(price * NEXT_ENTRY_MULTIPLIER))
                 
             else:
