@@ -7,7 +7,7 @@ nohup python3 blshlimit.py > /dev/null 2>&1 &
 echo $! > scripts.pid
 
 #nohup python3 avg_testaccount.py > /dev/null 2>&1 &
-nohup python3 roth_strat.py > /dev/null 2>&1 &
+nohup python3 roth_strat.py >> roth.log 2>&1 &
 
 echo $! >> scripts.pid
 
