@@ -270,7 +270,7 @@ class FiloStrategy:
 		#use key and secret from constants.py
 
 		key = constants.ALPACA_API_KEY3
-		secret = constants.ALPACA_API_SECRET3
+		secret = constants.ALPACA_SECRET_KEY3
 		self.trading_client = TradingClient(key, secret, paper=not self.live)
 		self.trading_stream = TradingStream(key, secret, paper=not self.live)
 		self.market_data_client = StockHistoricalDataClient(key, secret)
